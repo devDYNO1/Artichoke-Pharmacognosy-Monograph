@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ARTICHOKE — Pharmacognosy & Herbal Drug Monograph</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700&family=Cinzel:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            forest: {
+              900: '#122c21',
+              800: '#1b4332',
+              700: '#2d6a4f',
+              600: '#40916c',
+              400: '#74c69d',
+              200: '#b7e4c7',
+              100: '#d8f3dc',
+              50: '#f1f8f4'
+            },
+            parchment: '#f8f9f4',
+            thistle: {
+              600: '#7b2cbf',
+              500: '#9d4edd',
+              100: '#f3e8ff'
+            }
+          },
+          fontFamily: {
+            serif: ['Cinzel', 'Georgia', 'serif'],
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            arabic: ['Cairo', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #f8f9f4;
+      background-image: radial-gradient(#d8f3dc 0.75px, transparent 0.75px), radial-gradient(#d8f3dc 0.75px, #f8f9f4 0.75px);
+      background-size: 32px 32px;
+      background-position: 0 0, 16px 16px;
+      color: #1a241f;
+      overflow-x: hidden;
+    }
+
+    /* Gentle Botanical Animations */
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-7px) rotate(1.5deg); }
+    }
+
+    @keyframes swayLeaf {
+      0%, 100% { transform: rotate(-2deg); }
+      50% { transform: rotate(2.5deg); }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(123, 44, 191, 0.25); }
+      50% { box-shadow: 0 0 0 10px rgba(123, 44, 191, 0); }
+    }
+
+    .animate-float {
+      animation: floatSlow 5.5s ease-in-out infinite;
+    }
+
+    .animate-sway {
+      transform-origin: bottom center;
+      animation: swayLeaf 6s ease-in-out infinite;
+    }
+
+    /* Scroll Reveal Cards */
+    .monograph-card {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                  box-shadow 0.3s ease,
+                  border-color 0.3s ease;
+    }
+
+    .monograph-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .monograph-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 18px 36px -10px rgba(27, 67, 50, 0.14);
+      border-color: #74c69d;
+    }
+
+    /* Study Mode Key Term Highlighting */
+    .key-term {
+      transition: all 0.25s ease;
+      font-weight: 600;
+      color: #1b4332;
+    }
+
+    body.study-focus .key-term {
+      background: linear-gradient(120deg, #d8f3dc 0%, #b7e4c7 100%);
+      color: #122c21;
+      padding: 1px 6px;
+      border-radius: 6px;
+      box-shadow: 0 1px 2px rgba(27, 67, 50, 0.12);
+    }
+
+    body.study-focus .key-term-purple {
+      background: #f3e8ff;
+      color: #5a189a;
+      padding: 1px 6px;
+      border-radius: 6px;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f8f4;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #74c69d;
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #40916c;
+    }
+  </style>
+</head>
+<body class="font-sans antialiased selection:bg-forest-200 selection:text-forest-900">
+
+  <!-- Top Sticky Study Toolbar -->
+  <nav class="sticky top-0 z-50 backdrop-blur-md bg-parchment/90 border-b border-forest-200/80 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="w-3 h-3 rounded-full bg-forest-700 inline-block"></span>
+        <span class="font-serif font-bold text-forest-800 text-sm sm:text-base tracking-wide">CYNARAE FOLIUM</span>
+        <span class="hidden md:inline-block text-xs px-2 py-0.5 rounded-full bg-forest-100 text-forest-800 font-medium">Pharmacognosy Monograph</span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <!-- Search / Quick Filter Input -->
+        <div class="relative">
+          <input 
+            id="quickSearch" 
+            type="text" 
+            placeholder="Filter terms (e.g. cynarin, EMA)..." 
+            class="text-xs sm:text-sm pl-8 pr-3 py-1.5 w-44 sm:w-60 rounded-full bg-white border border-forest-200 focus:outline-none focus:border-forest-600 focus:ring-2 focus:ring-forest-200 transition"
+          />
+          <svg class="w-3.5 h-3.5 text-forest-600 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z"/>
+          </svg>
+        </div>
+
+        <!-- Highlight Key Terms Toggle -->
+        <button 
+          id="studyToggle" 
+          type="button"
+          class="flex items-center gap-1.5 text-xs sm:text-sm font-semibold px-3.5 py-1.5 rounded-full bg-forest-800 text-white hover:bg-forest-700 active:scale-95 transition shadow-sm cursor-pointer"
+          title="Highlight key exam terms"
+        >
+          <svg class="w-4 h-4 text-forest-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+          </svg>
+          <span id="studyToggleText">Study Highlight</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Banner -->
+  <header class="relative overflow-hidden pt-8 pb-10 px-4">
+    <div class="max-w-6xl mx-auto">
+      <div class="relative bg-gradient-to-br from-forest-900 via-forest-800 to-forest-700 rounded-3xl p-6 sm:p-10 text-white shadow-xl border border-forest-600/40 overflow-hidden">
+        
+        <!-- Subtle decorative background circles -->
+        <div class="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-thistle-600/20 blur-2xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-forest-400/15 blur-2xl pointer-events-none"></div>
+
+        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          
+          <!-- Left Botanical SVG: Globe Artichoke Head -->
+          <div class="hidden lg:flex lg:col-span-3 justify-center">
+            <svg class="w-44 h-44 animate-float drop-shadow-lg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Artichoke Bud Illustration">
+              <!-- Stem & Basal Leaves -->
+              <path d="M100 188V125" stroke="#74c69d" stroke-width="10" stroke-linecap="round"/>
+              <path d="M100 175C72 175 42 152 30 132C55 135 78 148 100 165Z" fill="#52b788" stroke="#1b4332" stroke-width="2.5"/>
+              <path d="M100 175C128 175 158 152 170 132C145 135 122 148 100 165Z" fill="#40916c" stroke="#1b4332" stroke-width="2.5"/>
+              <!-- Outer Bracts -->
+              <path d="M100 135C64 135 45 104 54 74C68 86 80 105 100 135Z" fill="#40916c" stroke="#122c21" stroke-width="2.5"/>
+              <path d="M100 135C136 135 155 104 146 74C132 86 120 105 100 135Z" fill="#2d6a4f" stroke="#122c21" stroke-width="2.5"/>
+              <!-- Middle Bracts -->
+              <path d="M100 128C68 118 58 82 72 52C85 68 92 92 100 128Z" fill="#74c69d" stroke="#122c21" stroke-width="2.5"/>
+              <path d="M100 128C132 118 142 82 128 52C115 68 108 92 100 128Z" fill="#52b788" stroke="#122c21" stroke-width="2.5"/>
+              <!-- Inner Crown Bracts -->
+              <path d="M100 115C78 96 76 62 91 34C98 52 100 78 100 115Z" fill="#95d5b2" stroke="#122c21" stroke-width="2.5"/>
+              <path d="M100 115C122 96 124 62 109 34C102 52 100 78 100 115Z" fill="#74c69d" stroke="#122c21" stroke-width="2.5"/>
+              <path d="M100 102C90 76 92 46 100 24C108 46 110 76 100 102Z" fill="#b7e4c7" stroke="#122c21" stroke-width="2.5"/>
+            </svg>
+          </div>
+
+          <!-- Center Title & Botanical Classification -->
+          <div class="lg:col-span-6 text-center space-y-4">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 border border-white/20 text-forest-200 text-xs font-semibold tracking-wider uppercase">
+              <span>Pharmacognosy • Herbal Drug Monograph</span>
+            </div>
+
+            <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white drop-shadow">
+              ARTICHOKE
+            </h1>
+
+            <div class="bg-forest-100/95 text-forest-900 rounded-2xl px-5 py-3 shadow-inner border border-forest-200 inline-block max-w-full">
+              <p class="font-semibold italic text-sm sm:text-base">
+                Cynara cardunculus L. <span class="not-italic font-normal text-forest-700">(syn. <em>Cynara scolymus</em> L.)</span>
+              </p>
+              <p class="text-xs sm:text-sm font-bold text-forest-800 mt-0.5">
+                Family: <span class="text-thistle-600">Asteraceae</span> &nbsp;•&nbsp; Arabic: <span class="font-arabic text-base text-forest-900">خرشوف</span>
+              </p>
+            </div>
+
+            <!-- Quick Jump Pills -->
+            <div class="pt-2 flex flex-wrap justify-center gap-1.5 sm:gap-2">
+              <a href="#card-1" class="px-3 py-1 rounded-full text-xs font-medium bg-white/15 hover:bg-white hover:text-forest-900 transition">1. Identity</a>
+              <a href="#card-2" class="px-3 py-1 rounded-full text-xs font-medium bg-white/15 hover:bg-white hover:text-forest-900 transition">2. Part & Habitat</a>
+              <a href="#card-3" class="px-3 py-1 rounded-full text-xs font-medium bg-white/15 hover:bg-white hover:text-forest-900 transition">3. Chemistry</a>
+              <a href="#card-4" class="px-3 py-1 rounded-full text-xs font-medium bg-white/15 hover:bg-white hover:text-forest-900 transition">4. Pharmacology</a>
+              <a href="#card-5" class="px-3 py-1 rounded-full text-xs font-medium bg-white/15 hover:bg-white hover:text-forest-900 transition">5. Indications</a>
+              <a href="#card-6" class="px-3 py-1 rounded-full text-xs font-medium bg-white/15 hover:bg-white hover:text-forest-900 transition">6. Preparations</a>
+              <a href="#card-7" class="px-3 py-1 rounded-full text-xs font-medium bg-white/15 hover:bg-white hover:text-forest-900 transition">7. Safety</a>
+            </div>
+          </div>
+
+          <!-- Right Botanical SVG: Purple Flowering Head -->
+          <div class="hidden lg:flex lg:col-span-3 justify-center">
+            <svg class="w-44 h-44 animate-sway drop-shadow-lg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Purple Artichoke Flower Illustration">
+              <!-- Stem -->
+              <path d="M100 190V115" stroke="#74c69d" stroke-width="9" stroke-linecap="round"/>
+              <!-- Purple Florets Fan -->
+              <g stroke="#c77dff" stroke-width="3" stroke-linecap="round">
+                <line x1="100" y1="82" x2="52" y2="34"/>
+                <line x1="100" y1="82" x2="64" y2="26"/>
+                <line x1="100" y1="82" x2="78" y2="20"/>
+                <line x1="100" y1="82" x2="92" y2="16"/>
+                <line x1="100" y1="82" x2="108" y2="16"/>
+                <line x1="100" y1="82" x2="122" y2="20"/>
+                <line x1="100" y1="82" x2="136" y2="26"/>
+                <line x1="100" y1="82" x2="148" y2="34"/>
+              </g>
+              <g stroke="#9d4edd" stroke-width="2.5" stroke-linecap="round">
+                <line x1="100" y1="82" x2="58" y2="42"/>
+                <line x1="100" y1="82" x2="71" y2="30"/>
+                <line x1="100" y1="82" x2="85" y2="24"/>
+                <line x1="100" y1="82" x2="100" y2="22"/>
+                <line x1="100" y1="82" x2="115" y2="24"/>
+                <line x1="100" y1="82" x2="129" y2="30"/>
+                <line x1="100" y1="82" x2="142" y2="42"/>
+              </g>
+              <!-- Receptacle Cup & Spiny Bracts -->
+              <path d="M62 78C62 110 80 124 100 124C120 124 138 110 138 78H62Z" fill="#40916c" stroke="#122c21" stroke-width="2.5"/>
+              <path d="M62 84L44 74L66 98Z" fill="#52b788" stroke="#122c21" stroke-width="2"/>
+              <path d="M138 84L156 74L134 98Z" fill="#52b788" stroke="#122c21" stroke-width="2"/>
+              <path d="M74 96L54 96L82 114Z" fill="#74c69d" stroke="#122c21" stroke-width="2"/>
+              <path d="M126 96L146 96L118 114Z" fill="#74c69d" stroke="#122c21" stroke-width="2"/>
+            </svg>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main 7 Monograph Cards Grid -->
+  <main class="max-w-6xl mx-auto px-4 pb-16 space-y-6">
+
+    <!-- Row 1: Cards 1 & 2 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- 1. BOTANICAL IDENTITY -->
+      <article id="card-1" data-keywords="botanical identity cynarae folium globe artichoke خرشوف mediterranean origin" class="monograph-card bg-white rounded-2xl border border-forest-200/90 shadow-sm overflow-hidden flex flex-col">
+        <div class="bg-forest-800 px-5 py-3.5 flex items-center justify-between">
+          <h2 class="font-serif text-white font-bold text-base sm:text-lg tracking-wide flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-full bg-forest-600 text-white text-sm font-sans font-bold flex items-center justify-center shadow">1</span>
+            BOTANICAL IDENTITY
+          </h2>
+          <span class="text-xs font-medium text-forest-200 bg-forest-900/50 px-2.5 py-0.5 rounded-full">Taxonomy</span>
+        </div>
+        
+        <div class="p-5 sm:p-6 flex-1 flex flex-col sm:flex-row items-center sm:items-start gap-5">
+          <!-- Custom SVG: Pinnatifid Artichoke Leaf -->
+          <div class="shrink-0 w-28 h-32 bg-forest-50 rounded-2xl border border-forest-100 flex items-center justify-center p-2">
+            <svg class="w-24 h-28" viewBox="0 0 120 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M60 132V16" stroke="#2d6a4f" stroke-width="3.5" stroke-linecap="round"/>
+              <!-- Lobed Leaf Blade -->
+              <path d="M60 14C52 24 44 34 48 42C36 36 22 40 18 48C28 52 38 56 44 62C28 60 14 66 10 76C24 78 36 80 44 86C28 88 18 96 16 106C30 104 44 102 52 108C55 112 58 116 60 120C62 116 65 112 68 108C76 102 90 104 104 106C102 96 92 88 76 86C84 80 96 78 110 76C106 66 92 60 76 62C82 56 92 52 102 48C98 40 84 36 72 42C76 34 68 24 60 14Z" fill="#52b788" stroke="#1b4332" stroke-width="2.5" stroke-linejoin="round"/>
+              <!-- Leaf Veins -->
+              <path d="M60 46L26 48M60 68L18 75M60 92L24 103M60 46L94 48M60 68L102 75M60 92L96 103" stroke="#1b4332" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+          <ul class="space-y-3 text-sm sm:text-[15px] text-gray-700 leading-relaxed flex-1">
+            <li class="flex items-start gap-2.5">
+              <span class="w-2 h-2 rounded-full bg-forest-600 mt-2 shrink-0"></span>
+              <span><strong>Official Drug:</strong> Artichoke leaf (<span class="key-term italic">Cynarae folium</span>)</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="w-2 h-2 rounded-full bg-forest-600 mt-2 shrink-0"></span>
+              <span><strong>Common & Arabic:</strong> <span class="key-term">Globe artichoke</span> &nbsp;|&nbsp; <span class="font-arabic font-bold text-forest-800 text-base bg-forest-50 px-2 py-0.5 rounded border border-forest-200">خرشوف</span></span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="w-2 h-2 rounded-full bg-forest-600 mt-2 shrink-0"></span>
+              <span><strong>Origin:</strong> <span class="key-term">Mediterranean region</span>, North Africa, Southern Europe, Canary Islands</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- 2. MEDICINAL PART & HABITAT -->
+      <article id="card-2" data-keywords="medicinal part basal leaves edible receptacle bracts habitat perennial herb" class="monograph-card bg-white rounded-2xl border border-forest-200/90 shadow-sm overflow-hidden flex flex-col">
+        <div class="bg-forest-800 px-5 py-3.5 flex items-center justify-between">
+          <h2 class="font-serif text-white font-bold text-base sm:text-lg tracking-wide flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-full bg-forest-600 text-white text-sm font-sans font-bold flex items-center justify-center shadow">2</span>
+            MEDICINAL PART & HABITAT
+          </h2>
+          <span class="text-xs font-medium text-forest-200 bg-forest-900/50 px-2.5 py-0.5 rounded-full">Morphology</span>
+        </div>
+
+        <div class="p-5 sm:p-6 flex-1 flex flex-col sm:flex-row items-center sm:items-start gap-5">
+          <!-- Custom SVG: Mediterranean Coast & Sun -->
+          <div class="shrink-0 w-28 h-32 bg-sky-50 rounded-2xl border border-sky-100 flex flex-col items-center justify-center p-2">
+            <svg class="w-24 h-24" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="60" cy="60" r="52" fill="#e0f2fe" stroke="#38bdf8" stroke-width="2"/>
+              <!-- Sun -->
+              <circle cx="82" cy="36" r="11" fill="#fbbf24"/>
+              <!-- Coastal Hill -->
+              <path d="M12 72C26 52 46 48 66 64C78 72 94 74 108 70V84H12V72Z" fill="#40916c"/>
+              <!-- Sea Waves -->
+              <path d="M10 80H110C104 98 84 112 60 112C36 112 16 98 10 80Z" fill="#0284c7"/>
+              <path d="M26 90Q40 86 54 90T82 90" stroke="#bae6fd" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M36 100Q50 96 64 100T90 100" stroke="#bae6fd" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+            <span class="text-[10px] font-bold text-sky-900 uppercase tracking-wider mt-1">Mediterranean</span>
+          </div>
+
+          <ul class="space-y-3 text-sm sm:text-[15px] text-gray-700 leading-relaxed flex-1">
+            <li class="flex items-start gap-2.5">
+              <span class="w-2 h-2 rounded-full bg-forest-600 mt-2 shrink-0"></span>
+              <span><strong>Medicinal Part:</strong> Fresh or dried <span class="key-term">basal leaves</span> (distinct from edible flower receptacle & lower bracts)</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="w-2 h-2 rounded-full bg-forest-600 mt-2 shrink-0"></span>
+              <span><strong>Habitat:</strong> <span class="key-term">Warm-temperate / subtropical</span>; widely cultivated around the Mediterranean</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="w-2 h-2 rounded-full bg-forest-600 mt-2 shrink-0"></span>
+              <span><strong>Plant Habit:</strong> <span class="key-term">Perennial herb</span> (up to 1.5 m), deeply divided leaves & purple flower heads</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+    </div>
+
+    <!-- Row 2: Cards 3 & 4 -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- 3. CHEMICAL CONSTITUENTS -->
+      <article id="card-3" data-keywords="chemical constituents phenolic acids caffeic chlorogenic cynarin sesquiterpene lactones cynaropicrin flavonoids luteolin" class="monograph-card bg-white rounded-2xl border border-forest-200/90 shadow-sm overflow-hidden flex flex-col">
+        <div class="bg-forest-800 px-5 py-3.5 flex items-center justify-between">
+          <h2 class="font-serif text-white font-bold text-base sm:text-lg tracking-wide flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-full bg-forest-600 text-white text-sm font-sans font-bold flex items-center justify-center shadow">3</span>
+            CHEMICAL CONSTITUENTS
+          </h2>
+          <span class="text-xs font-medium text-forest-200 bg-forest-900/50 px-2.5 py-0.5 rounded-full">Phytochemistry</span>
+        </div>
+
+        <div class="p-5 sm:p-6 flex-1 flex flex-col sm:flex-row items-center sm:items-start gap-5">
+          <!-- Custom SVG: Catechol / Caffeic Acid Derivative Chemical Structure -->
+          <div class="shrink-0 w-32 h-32 bg-forest-50 rounded-2xl border border-forest-100 flex flex-col items-center justify-center p-2">
+            <svg class="w-28 h-24" viewBox="0 0 150 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Benzene Ring -->
+              <polygon points="52,32 76,46 76,74 52,88 28,74 28,46" stroke="#1b4332" stroke-width="2.5" fill="white"/>
+              <!-- Double Bonds inside Ring -->
+              <line x1="52" y1="39" x2="70" y2="49" stroke="#40916c" stroke-width="2"/>
+              <line x1="70" y1="71" x2="52" y2="81" stroke="#40916c" stroke-width="2"/>
+              <line x1="34" y1="49" x2="34" y2="71" stroke="#40916c" stroke-width="2"/>
+              <!-- Hydroxyl Groups (HO-) -->
+              <line x1="28" y1="46" x2="16" y2="38" stroke="#1b4332" stroke-width="2"/>
+              <text x="1" y="38" fill="#1b4332" font-size="11" font-weight="bold" font-family="sans-serif">HO</text>
+              <line x1="28" y1="74" x2="16" y2="82" stroke="#1b4332" stroke-width="2"/>
+              <text x="1" y="91" fill="#1b4332" font-size="11" font-weight="bold" font-family="sans-serif">HO</text>
+              <!-- Side Chain -->
+              <polyline points="76,46 100,32 122,46 138,36" stroke="#1b4332" stroke-width="2.5" fill="none"/>
+              <line x1="100" y1="32" x2="100" y2="16" stroke="#1b4332" stroke-width="2"/>
+              <text x="93" y="13" fill="#7b2cbf" font-size="11" font-weight="bold" font-family="sans-serif">OH</text>
+              <line x1="120" y1="45" x2="120" y2="62" stroke="#1b4332" stroke-width="2"/>
+              <line x1="124" y1="45" x2="124" y2="62" stroke="#1b4332" stroke-width="2"/>
+              <text x="117" y="73" fill="#7b2cbf" font-size="11" font-weight="bold" font-family="sans-serif">O</text>
+            </svg>
+            <span class="text-[10px] font-bold text-forest-800 uppercase tracking-wider">Phenolic Core</span>
+          </div>
+
+          <ul class="space-y-2.5 text-sm sm:text-[15px] text-gray-700 leading-relaxed flex-1">
+            <li class="flex items-start gap-2.5">
+              <span class="w-2 h-2 rounded-full bg-forest-600 mt-2 shrink-0"></span>
+              <span><strong>Phenolic acids:</strong> <span class="key-term">Caffeic acid</span>, <span class="key-term">chlorogenic acid</span>, <span class="key-term">cynarin</span></span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="w-2 h-2 rounded-full bg-thistle-600 mt-2 shrink-0"></span>
+              <span><strong>Sesquiterpene lactones:</strong> <span class="key-term key-term-purple">Cynaropicrin</span>, dehydrocynaropicrin, grosheimin</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="w-2 h-2 rounded-full bg-forest-600 mt-2 shrink-0"></span>
+              <span><strong>Flavonoids:</strong> <span class="key-term">Luteolin glycosides</span> (scolymoside, cynaroside)</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="w-2 h-2 rounded-full bg-forest-600 mt-2 shrink-0"></span>
+              <span><strong>Others:</strong> Essential oil components, phytosterols</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- 4. ACTIONS & PHARMACOLOGY -->
+      <article id="card-4" data-keywords="actions pharmacology choleretic bile flow digestive fullness bloating flatulence antioxidant lipid-lowering" class="monograph-card bg-white rounded-2xl border border-forest-200/90 shadow-sm overflow-hidden flex flex-col">
+        <div class="bg-forest-800 px-5 py-3.5 flex items-center justify-between">
+          <h2 class="font-serif text-white font-bold text-base sm:text-lg tracking-wide flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-full bg-forest-600 text-white text-sm font-sans font-bold flex items-center justify-center shadow">4</span>
+            ACTIONS & PHARMACOLOGY
+          </h2>
+          <span class="text-xs font-medium text-forest-200 bg-forest-900/50 px-2.5 py-0.5 rounded-full">Activity</span>
+        </div>
+
+        <div class="p-5 sm:p-6 flex-1 flex flex-col sm:flex-row items-center sm:items-start gap-5">
+          <!-- Custom SVG: Liver & Gallbladder (Choleretic Action) -->
+          <div class="shrink-0 w-32 h-32 bg-amber-50/70 rounded-2xl border border-amber-200/70 flex flex-col items-center justify-center p-2">
+            <svg class="w-24 h-20" viewBox="0 0 130 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Liver Right & Left Lobes -->
+              <path d="M22 48C22 26 48 16 82 22C102 25 114 34 110 44C106 54 84 56 68 62C52 68 38 78 26 74C18 71 22 58 22 48Z" fill="#b93829" stroke="#7f1d1d" stroke-width="2.5"/>
+              <path d="M68 20L64 58" stroke="#7f1d1d" stroke-width="2" stroke-dasharray="3 2"/>
+              <!-- Gallbladder (Green) -->
+              <path d="M64 56C64 56 54 66 56 75C58 82 68 82 71 75C74 68 64 56 64 56Z" fill="#40916c" stroke="#1b4332" stroke-width="2"/>
+              <!-- Bile Flow Arrow -->
+              <path d="M64 81V93M60 89L64 94L68 89" stroke="#2d6a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="text-[10px] font-bold text-forest-900 bg-forest-200/80 px-2 py-0.5 rounded-full mt-1">Choleretic (↑ Bile)</span>
+          </div>
+
+          <ul class="space-y-2.5 text-sm sm:text-[15px] text-gray-700 leading-relaxed flex-1">
+            <li class="flex items-start gap-2.5">
+              <svg class="w-4 h-4 text-forest-600 mt-1 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+              <span><strong>Choleretic:</strong> <span class="key-term">Promotes bile flow</span> from liver & gallbladder</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <svg class="w-4 h-4 text-forest-600 mt-1 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+              <span><strong>Digestive:</strong> Relieves <span class="key-term">fullness, bloating, and flatulence</span></span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <svg class="w-4 h-4 text-forest-600 mt-1 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+              <span><strong>Antioxidant:</strong> Linked to <span class="key-term">phenolic acids & flavonoids</span></span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <svg class="w-4 h-4 text-forest-600 mt-1 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+              <span><strong>Lipid-lowering:</strong> Possible effect (clinical evidence varies)</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+    </div>
+
+    <!-- Row 3: Cards 5, 6 & 7 (3-Column Responsive Layout matching infographic bottom row) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- 5. INDICATIONS & TRADITIONAL USE -->
+      <article id="card-5" data-keywords="indications traditional use ema dyspepsia indigestion eda hyperlipidemia choleretic" class="monograph-card bg-white rounded-2xl border border-forest-200/90 shadow-sm overflow-hidden flex flex-col">
+        <div class="bg-forest-800 px-5 py-3.5 flex items-center justify-between">
+          <h2 class="font-serif text-white font-bold text-base tracking-wide flex items-center gap-2">
+            <span class="w-7 h-7 rounded-full bg-forest-600 text-white text-sm font-sans font-bold flex items-center justify-center shadow">5</span>
+            INDICATIONS & USE
+          </h2>
+        </div>
+
+        <div class="p-5 flex-1 flex flex-col justify-between gap-4">
+          <div class="flex items-start gap-4">
+            <!-- Custom SVG: Stomach & Digestive Relief -->
+            <div class="shrink-0 w-20 h-24 bg-rose-50 rounded-2xl border border-rose-100 flex items-center justify-center p-1.5">
+              <svg class="w-16 h-20" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M44 12V28C44 34 32 38 26 48C18 62 24 88 46 92C68 96 84 82 82 62C80 46 66 42 58 46C52 49 52 36 52 28V12" fill="#fda4af" stroke="#be123c" stroke-width="2.5" stroke-linecap="round"/>
+                <!-- Relief Waves -->
+                <path d="M14 54L8 50M14 70L8 74M88 54L94 50M88 70L94 74" stroke="#e11d48" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+
+            <ul class="space-y-2.5 text-sm text-gray-700 leading-relaxed">
+              <li class="flex items-start gap-2">
+                <span class="w-2 h-2 rounded-full bg-forest-600 mt-1.5 shrink-0"></span>
+                <span><strong>EMA:</strong> Traditional relief of <span class="key-term">dyspepsia / indigestion</span>, fullness, bloating & flatulence</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="w-2 h-2 rounded-full bg-forest-600 mt-1.5 shrink-0"></span>
+                <span><strong>EDA:</strong> Also lists <span class="key-term">hyperlipidemia</span> and <span class="key-term">choleretic</span> use</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="bg-forest-50 border border-forest-200 rounded-xl p-3 text-xs text-forest-900 leading-relaxed">
+            <strong>Clinical Note:</strong> Traditional use does not prove clinical efficacy; not a proven treatment for heart or liver disease.
+          </div>
+        </div>
+      </article>
+
+      <!-- 6. PREPARATIONS & INTERACTIONS -->
+      <article id="card-6" data-keywords="preparations infusion tea powdered leaf extracts interactions coumarin anticoagulants iron blood glucose antidiabetics" class="monograph-card bg-white rounded-2xl border border-forest-200/90 shadow-sm overflow-hidden flex flex-col">
+        <div class="bg-forest-800 px-5 py-3.5 flex items-center justify-between">
+          <h2 class="font-serif text-white font-bold text-base tracking-wide flex items-center gap-2">
+            <span class="w-7 h-7 rounded-full bg-forest-600 text-white text-sm font-sans font-bold flex items-center justify-center shadow">6</span>
+            PREPARATIONS
+          </h2>
+        </div>
+
+        <div class="p-5 flex-1 flex flex-col justify-between gap-4">
+          <div class="flex items-start gap-4">
+            <!-- Custom SVG: Herbal Tea Infusion Cup -->
+            <div class="shrink-0 w-20 h-24 bg-amber-50 rounded-2xl border border-amber-100 flex items-center justify-center p-1.5">
+              <svg class="w-16 h-20" viewBox="0 0 100 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Steam -->
+                <path d="M36 22C34 16 40 12 38 6M52 20C50 14 56 10 54 4" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/>
+                <!-- Cup Body -->
+                <path d="M22 34H70V62C70 76 58 86 46 86C34 86 22 76 22 62V34Z" fill="#fef3c7" stroke="#78350f" stroke-width="2.5"/>
+                <!-- Herbal Liquid -->
+                <ellipse cx="46" cy="36" rx="22" ry="5" fill="#d97706"/>
+                <!-- Handle -->
+                <path d="M70 42H78C84 42 86 58 78 62H70" stroke="#78350f" stroke-width="2.5" fill="none"/>
+                <!-- Saucer -->
+                <ellipse cx="46" cy="90" rx="34" ry="6" fill="#e5e7eb" stroke="#6b7280" stroke-width="2"/>
+                <!-- Garnish Leaf -->
+                <path d="M16 86C10 78 18 70 28 76C26 84 20 88 16 86Z" fill="#40916c" stroke="#1b4332" stroke-width="1.5"/>
+              </svg>
+            </div>
+
+            <ul class="space-y-2 text-sm text-gray-700 leading-relaxed">
+              <li class="flex items-start gap-2">
+                <span class="w-2 h-2 rounded-full bg-forest-600 mt-1.5 shrink-0"></span>
+                <span><strong>Forms:</strong> <span class="key-term">Dried-leaf infusion (tea)</span>, powdered leaf, dry/soft/liquid extracts</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="w-2 h-2 rounded-full bg-forest-600 mt-1.5 shrink-0"></span>
+                <span><strong>Dosing:</strong> Preparations are <span class="key-term">NOT interchangeable</span>; follow product directions</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Interactions Callout with Blood Drop SVG -->
+          <div class="bg-red-50/90 border border-red-200 rounded-xl p-3 flex items-center gap-3">
+            <svg class="w-8 h-9 shrink-0" viewBox="0 0 36 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 4C18 4 5 20 5 29C5 36.2 10.8 42 18 42C25.2 42 31 36.2 31 29C31 20 18 4 18 4Z" fill="#dc2626" stroke="#991b1b" stroke-width="2"/>
+              <path d="M12 28C12 32 14.5 35 17 36" stroke="#fca5a5" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <div class="text-xs text-red-950 leading-snug">
+              <strong class="text-red-800 block mb-0.5">Drug Interactions:</strong>
+              <span class="key-term">Coumarin anticoagulants</span> • <span class="key-term">Iron absorption</span> • <span class="key-term">↓ Blood glucose</span> (with antidiabetics)
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 7. SAFETY & INTERACTIONS / CONTRAINDICATIONS -->
+      <article id="card-7" data-keywords="safety diarrhea abdominal cramps nausea heartburn allergy asteraceae bile-duct obstruction gallstones pregnancy breastfeeding 12 years" class="monograph-card bg-white rounded-2xl border border-forest-200/90 shadow-sm overflow-hidden flex flex-col">
+        <div class="bg-forest-800 px-5 py-3.5 flex items-center justify-between">
+          <h2 class="font-serif text-white font-bold text-base tracking-wide flex items-center gap-2">
+            <span class="w-7 h-7 rounded-full bg-forest-600 text-white text-sm font-sans font-bold flex items-center justify-center shadow">7</span>
+            SAFETY & CAUTIONS
+          </h2>
+        </div>
+
+        <div class="p-5 flex-1 flex flex-col justify-between gap-4">
+          <div class="flex items-start gap-3.5">
+            <!-- Custom SVG: Warning Triangle -->
+            <div class="shrink-0 w-16 h-16 bg-amber-50 rounded-2xl border border-amber-200 flex items-center justify-center p-1">
+              <svg class="w-14 h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M32 8L58 54H6L32 8Z" fill="#facc15" stroke="#1f2937" stroke-width="3.5" stroke-linejoin="round"/>
+                <rect x="29.5" y="23" width="5" height="16" rx="2.5" fill="#1f2937"/>
+                <circle cx="32" cy="45.5" r="3" fill="#1f2937"/>
+              </svg>
+            </div>
+
+            <ul class="space-y-2 text-xs sm:text-sm text-gray-700 leading-snug">
+              <li class="flex items-start gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-600 mt-1.5 shrink-0"></span>
+                <span><strong>Side effects:</strong> Diarrhea, cramps, nausea, heartburn</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-red-600 mt-1.5 shrink-0"></span>
+                <span><strong>Avoid in:</strong> <span class="key-term">Asteraceae allergy</span> or <span class="key-term">bile-duct obstruction</span></span>
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-600 mt-1.5 shrink-0"></span>
+                <span><strong>Seek advice:</strong> Gallstones & liver/biliary disorders</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Special Populations Badges -->
+          <div class="grid grid-cols-2 gap-2.5 pt-1">
+            <div class="bg-forest-50 border border-forest-200 rounded-xl p-2.5 flex items-center gap-2">
+              <!-- Pregnancy Icon -->
+              <svg class="w-7 h-7 shrink-0 text-rose-700" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="15" cy="6" r="3.5"/>
+                <path d="M12 12c-2 3-2 8 0 11v6h5v-5c3-1 5-4 4-7-1-3-4-5-9-5z" stroke-linejoin="round"/>
+              </svg>
+              <div class="text-[11px] leading-tight text-gray-800">
+                <strong class="block text-forest-900">Pregnancy & Lactation</strong>
+                Not recommended (insufficient data)
+              </div>
+            </div>
+
+            <div class="bg-red-50/70 border border-red-200 rounded-xl p-2.5 flex items-center gap-2">
+              <!-- <12 Years Prohibited Icon -->
+              <svg class="w-7 h-7 shrink-0 text-red-600" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2">
+                <circle cx="16" cy="16" r="12"/>
+                <circle cx="16" cy="13" r="3.5"/>
+                <path d="M11 23c1.5-3 8.5-3 10 0"/>
+                <line x1="7.5" y1="7.5" x2="24.5" y2="24.5"/>
+              </svg>
+              <div class="text-[11px] leading-tight text-gray-800">
+                <strong class="block text-red-900">EDA Age Limit</strong>
+                Not recommended &lt; 12 years
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- Empty Filter State Message -->
+    <div id="noResults" class="hidden text-center py-10 bg-white rounded-2xl border border-forest-200">
+      <p class="text-forest-800 font-semibold">No monograph sections match your search term.</p>
+      <button id="resetFilter" class="mt-2 text-xs font-semibold px-4 py-1.5 rounded-full bg-forest-800 text-white hover:bg-forest-700 transition">Show All Sections</button>
+    </div>
+
+  </main>
+
+  <!-- Academic References Footer -->
+  <footer class="bg-forest-900 text-forest-100 border-t-4 border-forest-600">
+    <div class="max-w-6xl mx-auto px-4 py-6 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+      <div class="flex items-center gap-3">
+        <!-- Open Book SVG -->
+        <svg class="w-8 h-8 text-amber-300 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+        </svg>
+        <div>
+          <p class="text-xs sm:text-sm font-semibold italic text-white">
+            EDA Egyptian Herbal Monograph (4th ed., 2025) • EMA/HMPC (2017) • WHO Folium Cynarae (2009)
+          </p>
+          <p class="text-xs text-forest-300 mt-0.5">
+            Educational summary only • Follow current approved product information and professional medical advice.
+          </p>
+        </div>
+      </div>
+
+      <button 
+        onclick="window.scrollTo({top: 0, behavior: 'smooth'})" 
+        class="text-xs font-semibold px-4 py-2 rounded-full bg-forest-800 hover:bg-forest-700 text-forest-100 border border-forest-600 transition shrink-0 cursor-pointer"
+      >
+        ↑ Back to Top
+      </button>
+    </div>
+  </footer>
+
+  <!-- Interactive Logic: Scroll Stagger Animations, Study Highlight Mode & Instant Filter -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const cards = document.querySelectorAll('.monograph-card');
+      const studyToggle = document.getElementById('studyToggle');
+      const studyToggleText = document.getElementById('studyToggleText');
+      const quickSearch = document.getElementById('quickSearch');
+      const noResults = document.getElementById('noResults');
+      const resetFilter = document.getElementById('resetFilter');
+
+      // 1. Staggered Intersection Observer Reveal
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, idx) => {
+          if (entry.isIntersecting) {
+            setTimeout(() => {
+              entry.target.classList.add('visible');
+            }, idx * 80);
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+
+      cards.forEach(card => observer.observe(card));
+
+      // 2. Study Focus Mode (Highlights high-yield pharmacognosy terms)
+      let studyActive = false;
+      studyToggle.addEventListener('click', () => {
+        studyActive = !studyActive;
+        document.body.classList.toggle('study-focus', studyActive);
+        if (studyActive) {
+          studyToggle.classList.replace('bg-forest-800', 'bg-thistle-600');
+          studyToggle.classList.replace('hover:bg-forest-700', 'hover:bg-thistle-500');
+          studyToggleText.textContent = 'Highlight: ON';
+        } else {
+          studyToggle.classList.replace('bg-thistle-600', 'bg-forest-800');
+          studyToggle.classList.replace('hover:bg-thistle-500', 'hover:bg-forest-700');
+          studyToggleText.textContent = 'Study Highlight';
+        }
+      });
+
+      // 3. Real-time Term Filter
+      function filterCards(query) {
+        const term = query.trim().toLowerCase();
+        let visibleCount = 0;
+
+        cards.forEach(card => {
+          const content = (card.textContent + ' ' + (card.dataset.keywords || '')).toLowerCase();
+          if (!term || content.includes(term)) {
+            card.style.display = '';
+            card.classList.add('visible');
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        noResults.classList.toggle('hidden', visibleCount > 0);
+      }
+
+      quickSearch.addEventListener('input', (e) => filterCards(e.target.value));
+      resetFilter.addEventListener('click', () => {
+        quickSearch.value = '';
+        filterCards('');
+      });
+    });
+  </script>
+</body>
+</html>
